@@ -52,6 +52,17 @@ class User(AbstractUser):
         editable=False,
     )
 
+    is_active = models.BooleanField(
+        verbose_name='Is user account activated',
+        default=False,
+    )
+
+    otp_counter = models.PositiveIntegerField(
+        verbose_name='OTP counter',
+        default=0,
+        editable=False,
+    )
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 

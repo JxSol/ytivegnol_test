@@ -1,5 +1,10 @@
+import base64
+
+import pyotp
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
+from djoser.serializers import TokenCreateSerializer
 from rest_framework import serializers
 
 User = get_user_model()
@@ -7,51 +12,37 @@ User = get_user_model()
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     """Serializer for User objects."""
-    url = serializers.HyperlinkedIdentityField(
-        view_name='users:user-detail',
-        lookup_field='pk',
-    )
-
     password = serializers.CharField(
         write_only=True,
         required=True,
     )
 
-    is_active = serializers.BooleanField(
-        write_only=True,
-        default=False,
-    )
-
     class Meta:
         model = User
         fields = (
-            'url',
+            'id',
             'email',
             'password',
             'first_name',
             'last_name',
-            'is_active',
             'date_joined',
         )
         read_only_fields = (
-            'url',
+            'id',
             'date_joined',
         )
 
-    def create(self, validated_data) -> User:
-        user = super().create(validated_data)
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
+class OTPTokenCreateSerializer(TokenCreateSerializer):
+    otp = serializers.CharField(required=False)
 
-class ResetPasswordSerializer(serializers.Serializer):
-    """Serializer for reset password."""
-    current_password = serializers.CharField(
-        write_only=True,
-        required=True,
-    )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    new_password = serializers.CharField(
-        write_only=True,
-        required=True,
-    )
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        otp = attrs.get('otp')
+        key = base64.b32encode((self.user.email + settings.SECRET_KEY).encode())
+        hotp = pyotp.HOTP(key)
+        if hotp.verify(otp, self.user.otp_counter):
+            return attrs
+        self.fail("invalid_credentials")

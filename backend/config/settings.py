@@ -57,8 +57,9 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     # https://www.django-rest-framework.org/
     'rest_framework',
-    # https://django-rest-framework-simplejwt.readthedocs.io
-    'rest_framework_simplejwt',
+    'rest_framework.authtoken',
+    # https://djoser.readthedocs.io
+    'djoser',
     # https://github.com/adamchainz/django-cors-headers
     'corsheaders',
     # https://drf-spectacular.readthedocs.io
@@ -180,11 +181,34 @@ MEDIA_URL = '/media/'
 
 #
 
+# ------------------------- EMAIL CONFIGURATION
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-timeout
+EMAIL_TIMEOUT = 5
+
+# if os.getenv('EMAIL_HOST'):
+#     EMAIL_HOST = os.getenv('EMAIL_HOST')
+#     EMAIL_PORT = os.getenv('EMAIL_PORT')
+#     EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+#     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+#     EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
+#     DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = '587'
+EMAIL_HOST_USER = 'jxsol.test@gmail.com'
+EMAIL_HOST_PASSWORD = 'ilxafyndrgipguwk'
+EMAIL_USE_TLS = 'True'
+DEFAULT_FROM_EMAIL = 'jxsol.test@gmail.com'
+# ------------------------- END EMAIL CONFIGURATION
+
+#
+
 # ------------------- DJANGO REST FRAMEWORK CONFIGURATION ---------------------
 # https://www.django-rest-framework.org/api-guide/settings/
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
@@ -202,43 +226,15 @@ SPECTACULAR_SETTINGS = {
 }
 
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": False,
-    "UPDATE_LAST_LOGIN": False,
-
-    "ALGORITHM": "HS256",
-    "SIGNING_KEY": SECRET_KEY,
-    "VERIFYING_KEY": "",
-    "AUDIENCE": None,
-    "ISSUER": None,
-    "JSON_ENCODER": None,
-    "JWK_URL": None,
-    "LEEWAY": 0,
-
-    "AUTH_HEADER_TYPES": ("Bearer",),
-    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
-    "USER_ID_FIELD": "id",
-    "USER_ID_CLAIM": "user_id",
-    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
-
-    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
-    "TOKEN_TYPE_CLAIM": "token_type",
-    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
-
-    "JTI_CLAIM": "jti",
-
-    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
-    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
-    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
-
-    "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
-    "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
-    "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
-    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
-    "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
-    "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
+DJOSER = {
+    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    'SERIALIZERS': {
+        'user': 'applications.users.api.serializers.UserSerializer',
+        'current_user': 'applications.users.api.serializers.UserSerializer',
+        'token_create': 'applications.users.api.serializers.OTPTokenCreateSerializer',
+    },
 }
 # -----------------------------------------------------------------------------
