@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .serializers import UserSerializer
+from ..tasks import send_otp
 
 User = get_user_model()
 
@@ -27,11 +28,7 @@ class OTPSendAPIView(APIView):
                 user.save()
                 key = base64.b32encode((user.email + settings.SECRET_KEY).encode())
                 hotp = pyotp.HOTP(key)
-                send_mail(
-                    subject=f"Account authentication on {{ site_name }}",
-                    message=hotp.at(user.otp_counter),
-                    from_email=None,
-                    recipient_list=[user.email],
-                )
+                otp = hotp.at(user.otp_counter)
+                send_otp(user.email, otp, request.get_host())
                 return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
