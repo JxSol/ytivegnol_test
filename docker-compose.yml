@@ -1,0 +1,68 @@
+# docker compose up -d
+version: "3.9"
+services:
+  db:
+    container_name: longevity_db
+    image: postgres:15.3
+    expose:
+      - "5432"
+    volumes:
+      - longevity_volume_db:/var/lib/postgresql/data
+    restart: always
+    env_file: .env
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d ${DB_NAME} -U ${DB_USER}" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  
+  redis:
+    container_name: longevity_redis
+    image: redis:7.0-alpine
+    expose:
+      - "6379"
+
+  backend:
+    container_name: longevity_django
+    build:
+      context: ./backend
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - longevity_volume_static:/app/staticfiles
+      - longevity_volume_media:/app/media
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+
+  worker:
+    container_name: longevity_celery
+    build:
+      context: ./backend
+    env_file: .env
+    volumes:
+      - longevity_volume_static:/app/staticfiles
+    depends_on:
+      - redis
+    entrypoint: celery
+    command: -A config.celery.app worker -l INFO
+
+  nginx:
+    container_name: longevity_nginx
+    image: nginx:latest
+    restart: unless-stopped
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - longevity_volume_static:/data/static
+      - longevity_volume_media:/data/media
+
+volumes:
+  longevity_volume_static:
+  longevity_volume_media:
+  longevity_volume_db:

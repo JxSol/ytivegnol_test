@@ -19,6 +19,8 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 APPS_DIR = BASE_DIR / 'applications'
 # https://docs.djangoproject.com/en/dev/ref/settings/#locale-paths
 LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
+# https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
+ALLOWED_HOSTS = [os.getenv('HOST_DOMAIN')]
 # -----------------------------------------------------------------------------
 
 #
@@ -177,7 +179,7 @@ MEDIA_URL = '/media/'
 
 #
 
-# ------------------------- EMAIL CONFIGURATION
+# ------------------------- EMAIL CONFIGURATION -------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-timeout
@@ -196,7 +198,16 @@ EMAIL_HOST_USER = 'jxsol.test@gmail.com'
 EMAIL_HOST_PASSWORD = 'ilxafyndrgipguwk'
 EMAIL_USE_TLS = 'True'
 DEFAULT_FROM_EMAIL = 'jxsol.test@gmail.com'
-# ------------------------- END EMAIL CONFIGURATION
+# -----------------------------------------------------------------------------
+
+#
+
+# ------------------------- CSRF CONFIGURATION --------------------------------
+CSRF_TRUSTED_ORIGINS = []
+if csrf_domain := os.getenv('HOST_DOMAIN'):
+    CSRF_TRUSTED_ORIGINS += [f'http://*.{csrf_domain}',
+                             f'https://*.{csrf_domain}']
+# -----------------------------------------------------------------------------
 
 #
 
