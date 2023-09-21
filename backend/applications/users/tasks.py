@@ -10,5 +10,5 @@ def send_otp(email: str, otp: str, host: str) -> None:
         subject=f"Account authentication on {host}",
         message=f"Your authentication code:\n{otp}",
         from_email=None,
-        recipient_list=email,
+        recipient_list=[email],
     )
