@@ -3,11 +3,8 @@ import base64
 import pyotp
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import check_password
-from django.core.mail import send_mail
-from djoser.serializers import TokenCreateSerializer
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -17,10 +14,11 @@ from ..tasks import send_otp
 User = get_user_model()
 
 class OTPSendAPIView(APIView):
+    """View for sending OTP."""
     permission_classes = [AllowAny]
 
     def post(self, request, format=None):
-        serializer = TokenCreateSerializer(data=request.data)
+        serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = User.objects.filter(email=serializer.data.get('email')).first()
             if user:

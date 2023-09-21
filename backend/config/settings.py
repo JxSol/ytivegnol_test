@@ -236,7 +236,7 @@ SPECTACULAR_SETTINGS = {
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
-    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'ACTIVATION_URL': 'uid: {uid} | token: {token}',
     'SEND_ACTIVATION_EMAIL': True,
     'SERIALIZERS': {
         'user': 'applications.users.api.serializers.UserSerializer',

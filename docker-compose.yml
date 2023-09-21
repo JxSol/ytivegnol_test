@@ -35,8 +35,6 @@ services:
     build:
       context: ./backend
     env_file: .env
-    ports:
-      - "8000:8000"
     volumes:
       - longevity_volume_static:/app/staticfiles
       - longevity_volume_media:/app/media
