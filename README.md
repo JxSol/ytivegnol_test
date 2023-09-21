@@ -62,3 +62,20 @@ Responses with auth token for access to the API.
 Responses with your profile data.
 <br> `GET` https://longevity.jxsol.online/api/v1/users/me
 <br> `Authorization: Token f197e5b21938311f0896531d77416f692d870b22`
+
+## Running a project on a production server
+1. Open your server terminal.
+2. Check that Git and Docker versions are up to date. 
+You can find out how to do this on the Internet.
+3. Open your project directory or create it.
+4. Clone repository.
+```sh
+git clone https://github.com/JxSol/ytivegnol_test.git
+```
+5. Rename the file `.env.sample` to `.env`and fill its contents 
+in accordance with the comments indicated next to the variables.
+6. Run docker compose.
+```sh
+docker compose up -d
+```
+7. Project is deployed now.
