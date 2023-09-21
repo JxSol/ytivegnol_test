@@ -8,6 +8,8 @@ services:
       - "5432"
     volumes:
       - longevity_volume_db:/var/lib/postgresql/data
+    networks:
+      - longevity_network
     restart: always
     env_file: .env
     environment:
@@ -25,6 +27,8 @@ services:
     image: redis:7.0-alpine
     expose:
       - "6379"
+    networks:
+      - longevity_network
 
   backend:
     container_name: longevity_django
@@ -36,6 +40,9 @@ services:
     volumes:
       - longevity_volume_static:/app/staticfiles
       - longevity_volume_media:/app/media
+    networks:
+      - longevity_network
+      - nginx_proxy_manager
     restart: always
     depends_on:
       db:
@@ -48,6 +55,8 @@ services:
     env_file: .env
     volumes:
       - longevity_volume_static:/app/staticfiles
+    networks:
+      - longevity_network
     depends_on:
       - redis
     entrypoint: celery
@@ -61,8 +70,16 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - longevity_volume_static:/data/static
       - longevity_volume_media:/data/media
+    networks:
+      - nginx_proxy_manager
 
 volumes:
   longevity_volume_static:
   longevity_volume_media:
   longevity_volume_db:
+
+networks:
+  longevity_network:
+    name: longevity_network
+  nginx_proxy_manager:
+    external: true
