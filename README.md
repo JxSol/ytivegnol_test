@@ -63,7 +63,7 @@ Responses with your profile data.
 <br> `GET` https://longevity.jxsol.online/api/v1/users/me
 <br> `Authorization: Token f197e5b21938311f0896531d77416f692d870b22`
 
-## Running a project on a production server
+## Running the project on a production server
 1. Open your server terminal.
 2. Check that Git and Docker versions are up to date. 
 You can find out how to do this on the Internet.
